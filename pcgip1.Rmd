@@ -2,14 +2,13 @@
 title: "GIP1"
 output: html_notebook
 ---
-```{r}
+```{r packages}
 library(ggtree)
 library(ggplot2)
 library(ggforce)
 library(ggpubr)
 library(ggsignif)
 library(dplyr)
-setwd("C:/Users/52722/Desktop/GIP/")
 getwd()
 ```
 
@@ -17,7 +16,7 @@ getwd()
 
 ### SILENCING - AREA
 
-area_higs <- read.csv("GIP1_datos - area_higs.csv", stringsAsFactors=TRUE)
+area_higs <- read.csv("area_higs.csv", stringsAsFactors=TRUE)
 
 #Transform the data
 sm_ah = area_higs %>% mutate(time = as.factor(paste(area_higs$hpi, "HPI"))) %>% group_by(cmb = paste(area_higs$vector, area_higs$hpi)) %>% 
@@ -55,14 +54,14 @@ ggplot(sm_ah, aes(x=vector, y=mean)) +
   theme(text = element_text(size=20)) 
 
 #Saving
-ggsave(file="area_higs_bar.png", width=6, height=6, dpi=300)
+#ggsave(file="area_higs_bar.png", width=6, height=6, dpi=300)
 ```
 
 ```{r}
 
 ## PCGIP1 QRTPCR EXPRESSION
 
-exp_higs <- read.csv("GIP1_datos - gip_exp.csv", stringsAsFactors=TRUE)
+exp_higs <- read.csv("gip_exp.csv", stringsAsFactors=TRUE)
 
 sm_exp2 =
   exp_higs %>% mutate(time = as.factor(paste(exp_higs$hpi, "HPI"))) %>% group_by(cmb= paste(exp_higs$vector, exp_higs$hpi)) %>% 
@@ -96,14 +95,14 @@ ggplot(sm_exp2, aes(x=vector, y=mean)) +
   theme(legend.position = "none") +
   theme(text = element_text(size=20)) 
   
-ggsave(file="exp_higs_bar.png", width=6, height=6, dpi=300)
+#ggsave(file="exp_higs_bar.png", width=6, height=6, dpi=300)
 ```
 
 ```{r}
 
 ##OVEREXPRESSION - AREA
 
-ar_ov <- read.csv("GIP1_datos - OVEREXPRESSION.csv", stringsAsFactors=TRUE)
+ar_ov <- read.csv("area_ov.csv", stringsAsFactors=TRUE)
 
 sm_ov=
   ar_ov %>% mutate(time = as.factor(paste(ar_ov$hpi, "HPI"))) %>% group_by(cmb= paste(ar_ov$vector, ar_ov$hpi)) %>% 
@@ -139,14 +138,14 @@ ggplot(sm_ov, aes(x=vector, y=mean)) +
   theme(legend.position = "none") +
   theme(text = element_text(size=20)) 
   
-ggsave(file="area_over_bar.png", width=6, height=6, dpi=300)
+#ggsave(file="area_over_bar.png", width=6, height=6, dpi=300)
 ```
 
 ```{r}
 
 ## ROS + PCD / OVEREXPRESSION + SILENCING
 
-silov <- read.csv("GIP1_datos - ROS_PCD.csv", stringsAsFactors=TRUE)
+silov <- read.csv("ros_pcd.csv", stringsAsFactors=TRUE)
 
 roscd=
   silov %>% group_by(cmb= paste(silov$vector, silov$mb)) %>% 
