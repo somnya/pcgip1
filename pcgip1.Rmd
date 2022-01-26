@@ -1,0 +1,177 @@
+---
+title: "GIP1"
+output: html_notebook
+---
+```{r}
+library(ggtree)
+library(ggplot2)
+library(ggforce)
+library(ggpubr)
+library(ggsignif)
+library(dplyr)
+setwd("C:/Users/52722/Desktop/GIP/")
+getwd()
+```
+
+```{r}
+
+### SILENCING - AREA
+
+area_higs <- read.csv("GIP1_datos - area_higs.csv", stringsAsFactors=TRUE)
+
+#Transform the data
+sm_ah = area_higs %>% mutate(time = as.factor(paste(area_higs$hpi, "HPI"))) %>% group_by(cmb = paste(area_higs$vector, area_higs$hpi)) %>% 
+  summarise(
+  area,
+  vector, 
+  time,
+  hpi = as.factor(hpi),
+  mean=mean(area),
+  sd=sd(area),
+  ) 
+sm_ah 
+
+#Calculate statistics
+ta48 = t.test(sm_ah$area[sm_ah$cmb=="EV 48"], sm_ah$area[sm_ah$cmb=="HIGS 48"], alternative = "greater", conf.level = 0.95)
+ta24 = t.test(sm_ah$area[sm_ah$cmb=="EV 24"], sm_ah$area[sm_ah$cmb=="HIGS 24"], alternative = "greater", conf.level = 0.95)
+anno_df = data.frame(time = c("24 HPI", "48 HPI"), group1=rep("EV", 2), group2=rep("HIGS", 2), p.value=c(round(ta24$p.value, 4), round(ta48$p.value, 4)), y_pos=c(max(sm_ah$area[sm_ah$hpi=="24"])+10, max(sm_ah$area[sm_ah$hpi=="48"])+10))
+anno_df
+
+#Plotting
+ggplot(sm_ah, aes(x=vector, y=mean)) + 
+  geom_bar(aes(fill=vector), stat="identity", position=position_dodge()) +
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, position=position_dodge(.9)) +
+  facet_wrap(~time) +
+  geom_signif(
+    data=anno_df, 
+    aes(xmin=group1, xmax=group2, annotations=p.value, y_position=y_pos), 
+    manual=TRUE
+  ) +
+  xlab("Treatment") + 
+  ylab("Infected leaf area (percentaje)") +
+  scale_fill_manual(values=c("#6276F6", "#5EBF75")) +
+  theme_gray() +
+  theme(legend.position = "none") +
+  theme(text = element_text(size=20)) 
+
+#Saving
+ggsave(file="area_higs_bar.png", width=6, height=6, dpi=300)
+```
+
+```{r}
+
+## PCGIP1 QRTPCR EXPRESSION
+
+exp_higs <- read.csv("GIP1_datos - gip_exp.csv", stringsAsFactors=TRUE)
+
+sm_exp2 =
+  exp_higs %>% mutate(time = as.factor(paste(exp_higs$hpi, "HPI"))) %>% group_by(cmb= paste(exp_higs$vector, exp_higs$hpi)) %>% 
+  summarise(
+  pcr,
+  vector,
+  time,
+  hpi=as.factor(hpi), 
+  mean=mean(pcr),
+  sd=sd(pcr)
+  )
+
+tex48 = t.test(sm_exp2$pcr[sm_exp2$cmb=="EV 48"], sm_exp2$pcr[sm_exp2$cmb=="HIGS 48"], alternative = "greater", conf.level = 0.95)
+tex24 = t.test(sm_exp2$pcr[sm_exp2$cmb=="EV 24"], sm_exp2$pcr[sm_exp2$cmb=="HIGS 24"], alternative = "greater", conf.level = 0.95)
+anno_df_ex = data.frame(time = c("24 HPI", "48 HPI"), group1=rep("EV", 2), group2=rep("HIGS", 2), p.value=c(round(tex24$p.value, 4), round(tex48$p.value, 4)), y_pos=c(max(sm_exp2$pcr[sm_exp2$hpi=="24"])+2, max(sm_exp2$pcr[sm_exp2$hpi=="48"])+2))
+anno_df_ex
+
+ggplot(sm_exp2, aes(x=vector, y=mean)) + 
+  geom_bar(aes(fill=vector), stat="identity", position=position_dodge()) +
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, position=position_dodge(.9)) +
+  facet_wrap(~time) +
+  geom_signif(
+    data=anno_df_ex, 
+    aes(xmin=group1, xmax=group2, annotations=p.value, y_position=y_pos), 
+    manual=TRUE
+  ) +
+  xlab("Treatment") + 
+  ylab("Relative PcGIP1 expression (QR Log2)") +
+  scale_fill_manual(values=c("#6276F6", "#5EBF75")) +
+  theme_gray() +
+  theme(legend.position = "none") +
+  theme(text = element_text(size=20)) 
+  
+ggsave(file="exp_higs_bar.png", width=6, height=6, dpi=300)
+```
+
+```{r}
+
+##OVEREXPRESSION - AREA
+
+ar_ov <- read.csv("GIP1_datos - OVEREXPRESSION.csv", stringsAsFactors=TRUE)
+
+sm_ov=
+  ar_ov %>% mutate(time = as.factor(paste(ar_ov$hpi, "HPI"))) %>% group_by(cmb= paste(ar_ov$vector, ar_ov$hpi)) %>% 
+  summarise(
+  area,
+  vector,
+  time,
+  hpi=as.factor(hpi), 
+  mean=mean(area),
+  sd=sd(area)
+  )
+sm_ov
+
+#Calculate statistics
+tov48 = t.test(sm_ov$area[sm_ov$cmb=="EV 48"], sm_ov$area[sm_ov$cmb=="OE 48"], alternative = "greater", conf.level = 0.95)
+tov24 = t.test(sm_ov$area[sm_ov$cmb=="EV 24"], sm_ov$area[sm_ov$cmb=="OE 24"], alternative = "greater", conf.level = 0.95)
+anno_df_ov = data.frame(time = c("24 HPI", "48 HPI"), group1=rep("EV", 2), group2=rep("OE", 2), p.value=c(round(tov24$p.value, 4), round(tov48$p.value, 4)), y_pos=c(max(sm_ov$area[sm_ov$hpi=="24"])+5, max(sm_ov$area[sm_ov$hpi=="48"])+5))
+anno_df_ov
+
+ggplot(sm_ov, aes(x=vector, y=mean)) + 
+  geom_bar(aes(fill=vector), stat="identity", position=position_dodge()) +
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, position=position_dodge(.9)) +
+  facet_wrap(~time) +
+  geom_signif(
+    data=anno_df_ov, 
+    aes(xmin=group1, xmax=group2, annotations=p.value, y_position=y_pos), 
+    manual=TRUE
+  ) +
+  xlab("Treatment") + 
+  ylab("Infected leaf area (percentaje)") +
+  scale_fill_manual(values=c("#6276F6", "#5EBF75")) +
+  theme_gray() +
+  theme(legend.position = "none") +
+  theme(text = element_text(size=20)) 
+  
+ggsave(file="area_over_bar.png", width=6, height=6, dpi=300)
+```
+
+```{r}
+
+## ROS + PCD / OVEREXPRESSION + SILENCING
+
+silov <- read.csv("GIP1_datos - ROS_PCD.csv", stringsAsFactors=TRUE)
+
+roscd=
+  silov %>% group_by(cmb= paste(silov$vector, silov$mb)) %>% 
+  summarise(
+  area,
+  vector,
+  staining,
+  mb,
+  mean=mean(area),
+  sd=sd(area)
+  )
+roscd
+
+
+ggplot(roscd, aes(x=vector, y=mean, fill=mb)) + 
+  geom_bar( stat="identity", position=position_dodge()) + 
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, position=position_dodge(.9)) +
+  xlab("Treatment") + 
+  ylab("Damaged leaf area (percentaje)") +
+  labs(fill="Methodology") +
+  scale_fill_manual(values=c("#E69F00", "#CC6677")) +
+  theme_gray() +
+  theme(legend.position = c(0.8, 0.8)) +
+  theme(text = element_text(size=20)) 
+ggsave(file="area_roscd_bar.png", width=6, height=12, dpi=300)
+```
+
+
