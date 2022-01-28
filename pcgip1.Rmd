@@ -159,17 +159,36 @@ roscd=
   )
 roscd
 
+#Calculate statistics
+rosavr = t.test(roscd$area[roscd$cmb=="AVR3a1 overexpression"], roscd$area[roscd$cmb=="AVR3a1 silencing"], alternative = "greater", conf.level = 0.95)
 
-ggplot(roscd, aes(x=vector, y=mean, fill=mb)) + 
-  geom_bar( stat="identity", position=position_dodge()) + 
-  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, position=position_dodge(.9)) +
-  xlab("Treatment") + 
+rosev = t.test(roscd$area[roscd$cmb=="EV overexpression"], roscd$area[roscd$cmb=="EV silencing"], alternative = "greater", conf.level = 0.95)
+
+rosgip= t.test(roscd$area[roscd$cmb=="GIP1 overexpression"], roscd$area[roscd$cmb=="GIP1 silencing"], alternative = "greater", conf.level = 0.95)
+
+rosinf= t.test(roscd$area[roscd$cmb=="INF1 overexpression"], roscd$area[roscd$cmb=="INF1 silencing"], alternative = "greater", conf.level = 0.95)
+
+anno_df_ros = data.frame(vector = c("AVR3a1", "EV", "GIP1", "INF1"), mb1=rep("overexpression", 4), mb2=rep("silencing", 4), p.value=c(round(rosavr$p.value, 4), round(rosev$p.value, 4), round(rosgip$p.value, 4), round(rosinf$p.value, 4)), 
+                        y_pos=c(max(roscd$area[roscd$vector=="AVR3a1"])+5, max(roscd$area[roscd$vector=="EV"])+5, max(roscd$area[roscd$vector=="GIP1"])+5, max(roscd$area[roscd$vector=="INF1"])+5))
+anno_df_ros
+
+
+ggplot(roscd, aes(x=mb, y=mean)) + 
+  geom_bar(aes(fill=mb), stat="identity", position=position_dodge()) + 
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2, position=position_dodge(0.9)) +
+  facet_wrap(~vector, ncol = 4) +
+  xlab(NULL) + 
   ylab("Damaged leaf area (percentaje)") +
   labs(fill="Methodology") +
   scale_fill_manual(values=c("#E69F00", "#CC6677")) +
   theme_gray() +
   theme(legend.position = c(0.8, 0.8)) +
-  theme(text = element_text(size=20)) 
+  theme(text = element_text(size=20), axis.text.x = element_blank(), legend.position = "bottom") +
+  geom_signif(
+    data=anno_df_ros, 
+    aes(xmin=mb1, xmax=mb2, annotations=p.value, y_position=y_pos), 
+    manual=TRUE, inherit.aes = FALSE
+  ) 
 #ggsave(file="area_roscd_bar.png", width=12, height=6, dpi=300)
 ```
 
