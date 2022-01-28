@@ -51,7 +51,7 @@ ggplot(sm_ah, aes(x=vector, y=mean)) +
   scale_fill_manual(values=c("#6276F6", "#5EBF75")) +
   theme_gray() +
   theme(legend.position = "none") +
-  theme(text = element_text(size=20)) 
+  theme(text = element_text(size=20), rect = element_rect(colour = "red")) 
 
 #Saving
 #ggsave(file="area_higs_bar.png", width=6, height=6, dpi=300)
@@ -170,7 +170,7 @@ ggplot(roscd, aes(x=vector, y=mean, fill=mb)) +
   theme_gray() +
   theme(legend.position = c(0.8, 0.8)) +
   theme(text = element_text(size=20)) 
-ggsave(file="area_roscd_bar.png", width=6, height=12, dpi=300)
+#ggsave(file="area_roscd_bar.png", width=12, height=6, dpi=300)
 ```
 
 
